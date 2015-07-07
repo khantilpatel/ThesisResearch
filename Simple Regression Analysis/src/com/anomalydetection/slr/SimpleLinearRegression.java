@@ -9,20 +9,34 @@ public class SimpleLinearRegression {
 
 	ArrayList<Double> history_error_list = new ArrayList<Double>(0);
 
-	final int N = 10;
-	final double ALPHA = 2.75;
+	int N = 10;
+	double ALPHA = 6;
 
 	private double error_mean = 0;
 
 	private double error_std = 0;
 
+	private double beta1 =0;
+	
+	private double beta0 = 0;
+	
+	private double z_value =0;
 	int countAnomalies = 0;
+	
+	
+
+	public SimpleLinearRegression(int n, double aLPHA) {
+		super();
+		N = n;
+		ALPHA = aLPHA;
+	}
 
 	boolean processCurrentDataPoint(TimeSeriesDataPoint dt) {
 
 		if (dt.getValue_x() == 4.0) {
 			System.out.println("");
 		}
+		
 		boolean isAnomaly = false;
 		// Step 1 : estimate beta
 		double predicted_dt_value = calculateBeta(dt);
@@ -34,10 +48,10 @@ public class SimpleLinearRegression {
 		double error = dt.getValue_y() - predicted_dt_value;
 
 		// Step 4: update mean and STD for error
-		updateErrorFunction(error);
+		updateErrorFunction(Math.abs(error));
 
 		// Step 5: check the z-value test on the errors
-		isAnomaly = z_valueTest(error);
+		isAnomaly = z_valueTest(Math.abs(error));
 
 		if (isAnomaly)
 			countAnomalies++;
@@ -45,10 +59,14 @@ public class SimpleLinearRegression {
 		System.out.println("dt::" + dt.getValue_x()
 				+ " dy::"
 				+ dt.getValue_y()
-				// + " || beta::" + beta
-				+ " || y_cap::" + predicted_dt_value + " || error::" + error
-				+ "|| erro_mean::" + this.error_mean + " || error_std::"
-				+ this.error_std + " || isAnomaly::" + isAnomaly
+				+ " || y_cap::" + predicted_dt_value 
+				+ " || beta0::" + beta0
+				+ " || beta1::" + beta1			
+				+ " || error::" + Math.abs(error)
+				+ " || erro_mean::" + this.error_mean 
+				+ " || error_std::"	+ this.error_std
+				+ " || z-value::"	+ this.z_value
+				+ " || isAnomaly::" + isAnomaly
 				+ " || countAnomaly::" + countAnomalies);
 
 		return isAnomaly;
@@ -94,9 +112,9 @@ public class SimpleLinearRegression {
 			// S_xy += d.getValue_x() * d.getValue_y();
 		}
 
-		double beta1 = xybar / xxbar;
+		 beta1 = xybar / xxbar;
 
-		double beta0 = ybar - (beta1 * xbar);
+		 beta0 = ybar - (beta1 * xbar);
 
 		double predicted_y =  beta0 + beta1 * dt.getValue_x();
 		// double num = ((history_datapoint_list.size() * S_xy) - S_x * S_y);
@@ -122,13 +140,13 @@ public class SimpleLinearRegression {
 	private void updateErrorFunction(Double error) {
 		if (!error.equals(Double.NaN)) {
 			
-			history_error_list.add(error);
+			
 			
 			this.error_mean = AlgorithmUtility.cal_mean(history_error_list);
 
 			this.error_std = AlgorithmUtility.calc_std_dev_givenMean(
 					history_error_list, this.error_mean);
-
+			history_error_list.add(error);
 		
 		}
 	}
@@ -136,7 +154,7 @@ public class SimpleLinearRegression {
 	private boolean z_valueTest(double error) {
 
 		boolean result = false;
-		double z_value = Math.abs((error - this.error_mean)) / this.error_std;
+		 z_value = Math.abs((error - this.error_mean)) / this.error_std;
 
 		if (z_value > ALPHA) {
 			result = true;

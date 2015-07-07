@@ -61,7 +61,7 @@ public class AlgorithmUtility {
 			total_dev += distance;
 		}
 
-		double window_std_dev = Math.sqrt(total_dev / bins.size());
+		double window_std_dev = Math.sqrt(total_dev / (bins.size()-1));
 
 		return window_std_dev;
 	}
