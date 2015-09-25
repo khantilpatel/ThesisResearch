@@ -66,7 +66,7 @@ public class AlgorithmUtility {
 		return window_std_dev;
 	}
 
-	static List<TimeSeriesDataPoint> readFromCSV(String filePath) {
+	public static List<TimeSeriesDataPoint> readFromCSV(String filePath) {
 		System.out.println("::Reading CSV::");
 		ArrayList<TimeSeriesDataPoint> list = new ArrayList<TimeSeriesDataPoint>(
 				0);
